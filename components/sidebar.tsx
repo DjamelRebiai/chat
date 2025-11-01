@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import type { Socket } from "socket.io-client"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -24,6 +24,15 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
   const [users, setUsers] = useState<any[]>([])
   const [showUserSearch, setShowUserSearch] = useState(false)
   const router = useRouter()
+  const firstButtonRef = React.useRef<HTMLButtonElement>(null)
+
+  // Focus management
+  useEffect(() => {
+    if (isOpen) {
+      // Focus the first interactive element when sidebar opens
+      firstButtonRef.current?.focus()
+    }
+  }, [isOpen])
 
   const handleLogout = () => {
     localStorage.removeItem("token")
@@ -69,11 +78,22 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
   return (
     <>
       {/* Backdrop for mobile when open */}
-      {isOpen ? (
-        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={onClose} />
-      ) : null}
+      <div 
+        aria-hidden="true"
+        className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onClose}
+      />
 
-      <div className={`bg-slate-800 border-r border-slate-700 flex flex-col w-72 md:static md:translate-x-0 z-50 transform transition-transform ${isOpen ? 'translate-x-0 fixed left-0 top-0 bottom-0' : 'md:translate-x-0 -translate-x-full md:relative'}`}>
+      <div 
+        id="mobile-sidebar"
+        role="dialog"
+        aria-label="Navigation menu"
+        aria-modal={isOpen}
+        className={`bg-slate-800 border-r border-slate-700 flex flex-col w-72 md:static md:translate-x-0 z-50 transform transition-all duration-300 ease-in-out shadow-lg 
+        ${isOpen ? 'translate-x-0 fixed left-0 top-0 bottom-0' : 'md:translate-x-0 -translate-x-full md:relative'}`}
+      >
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -81,8 +101,15 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
             <p className="text-xs text-slate-400">Fast & secure messaging</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="ghost" onClick={() => setShowUserSearch(!showUserSearch)} className="border-transparent">
-            <Plus size={18} />
+            <Button 
+              ref={firstButtonRef}
+              size="sm" 
+              variant="ghost" 
+              onClick={() => setShowUserSearch(!showUserSearch)} 
+              className="border-transparent"
+              aria-label="Add new conversation"
+            >
+              <Plus size={18} />
             </Button>
             {/* Mobile close button */}
             {onClose ? (

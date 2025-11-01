@@ -129,6 +129,7 @@ export default function ChatLayout() {
                 socket?.emit("initiate_call", { conversationId: selectedConversation })
               }}
               onToggleSidebar={() => setSidebarOpen((s) => !s)}
+              isOpen={sidebarOpen}
             />
             <ChatWindow conversationId={selectedConversation} socket={socket} />
           </>
