@@ -67,7 +67,7 @@ export default function TopBar({ conversation, onCallClick, onToggleSidebar, isO
   }
 
   return (
-    <div className="w-full sticky top-0 z-20 border-b border-slate-700 bg-slate-800/60 backdrop-blur-sm px-4 py-3 flex items-center justify-between">
+    <div className="w-full sticky top-0 z-20 border-b border-slate-700 bg-slate-800/60 backdrop-blur-sm px-4 md:px-6 py-3 flex items-center justify-between">
   <div className="flex items-center gap-3">
         {/* Toggle sidebar (visible on all sizes) */}
         <Button
@@ -81,18 +81,18 @@ export default function TopBar({ conversation, onCallClick, onToggleSidebar, isO
         >
           {isOpen ? <X size={18} /> : <Menu size={18} />}
         </Button>
-        <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-lg font-semibold">{participantInitial}</div>
-        <div>
-          <h2 className="text-lg font-semibold text-white">{participantDisplayName}</h2>
-          <p className="text-xs text-slate-400">{conversation ? 'Online' : 'Select a conversation'}</p>
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-700 flex items-center justify-center text-sm md:text-lg font-semibold">{participantInitial}</div>
+        <div className="hidden sm:flex flex-col sm:ml-2 md:ml-3">
+          <h2 className="text-sm md:text-lg font-semibold text-white leading-tight">{participantDisplayName}</h2>
+          <p className="text-xs text-slate-400 mt-0.5">{conversation ? 'Online' : 'Select a conversation'}</p>
         </div>
       </div>
 
-  <div className="flex items-center gap-2">
-        <Button size="icon" variant="ghost" className="border-transparent hover:bg-slate-700/40" disabled={!conversation}>
+      <div className="flex items-center gap-2">
+        <Button size="icon" variant="ghost" className="border-transparent hover:bg-slate-700/40" disabled={!conversation} aria-label="Start voice call">
           <Phone size={18} />
         </Button>
-        <Button size="icon" variant="ghost" className="border-transparent hover:bg-slate-700/40" onClick={onCallClick} disabled={!conversation}>
+        <Button size="icon" variant="ghost" className="border-transparent hover:bg-slate-700/40" onClick={onCallClick} disabled={!conversation} aria-label="Start video call">
           <Video size={18} />
         </Button>
 

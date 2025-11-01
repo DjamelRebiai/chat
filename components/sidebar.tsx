@@ -89,17 +89,17 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
         role="dialog"
         aria-label="Navigation menu"
         aria-modal={isOpen}
-        className={`bg-slate-800 border-r border-slate-700 flex flex-col w-72 z-50 transform transition-transform duration-300 ease-in-out shadow-lg
-          ${isOpen ? 'translate-x-0 fixed left-0 top-0 bottom-0' : '-translate-x-full md:translate-x-0 md:relative'}`}
+        className={`bg-slate-800 border-r border-slate-700 flex flex-col z-50 transform transition-transform duration-300 ease-in-out shadow-lg
+          ${isOpen ? 'translate-x-0 fixed left-0 top-0 bottom-0 w-72' : '-translate-x-full md:translate-x-0 md:relative md:w-72 lg:w-80'}`}
       >
-      <div className="p-4">
+      <div className="p-4 md:p-5 lg:p-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">ChatFlow</h1>
             <p className="text-xs text-slate-400">Fast & secure messaging</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button 
+            <Button
               ref={firstButtonRef}
               size="sm" 
               variant="ghost" 
@@ -109,7 +109,7 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
             >
               <Plus size={18} />
             </Button>
-            {/* no mobile close button when sidebar is always visible */}
+            {/* compact toggle visible on md+ if desired (kept simple) */}
           </div>
         </div>
 
