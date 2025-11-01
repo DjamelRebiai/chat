@@ -18,7 +18,20 @@ export default function ChatLayout() {
   const [user, setUser] = useState<any>(null)
   const [isCallActive, setIsCallActive] = useState(false)
   const [callData, setCallData] = useState<any>(null)
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
 
+  // initialize sidebar visibility based on screen width (show on md+)
+  useEffect(() => {
+    function update() {
+      try {
+        const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768
+        setSidebarOpen(isDesktop)
+      } catch (e) {}
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
   useEffect(() => {
     const userData = localStorage.getItem("user")
     if (userData) {
@@ -107,9 +120,13 @@ export default function ChatLayout() {
         selectedConversation={selectedConversation}
         onSelectConversation={(id: string) => {
           setSelectedConversation(id)
+          // close sidebar on mobile after selecting a conversation
+          if (typeof window !== 'undefined' && window.innerWidth < 768) setSidebarOpen(false)
         }}
         socket={socket}
         unreadCounts={unreadCounts}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
       <div className="flex-1 flex flex-col">
         {selectedConversation ? (
@@ -124,6 +141,8 @@ export default function ChatLayout() {
                 setIsCallActive(true)
                 socket?.emit("initiate_call", { conversationId: selectedConversation })
               }}
+              onToggleSidebar={() => setSidebarOpen((s) => !s)}
+              isOpen={sidebarOpen}
             />
             <ChatWindow conversationId={selectedConversation} socket={socket} />
           </>

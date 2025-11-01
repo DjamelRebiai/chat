@@ -14,15 +14,25 @@ interface SidebarProps {
   onSelectConversation: (id: string) => void
   socket: Socket | null
   unreadCounts?: Record<string, number>
+  isOpen?: boolean
+  onClose?: () => void
 }
 
-export default function Sidebar({ conversations, selectedConversation, onSelectConversation, socket, unreadCounts }: SidebarProps) {
+export default function Sidebar({ conversations, selectedConversation, onSelectConversation, socket, unreadCounts, isOpen, onClose }: SidebarProps) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || ""
   const [searchTerm, setSearchTerm] = useState("")
   const [users, setUsers] = useState<any[]>([])
   const [showUserSearch, setShowUserSearch] = useState(false)
   const router = useRouter()
   const firstButtonRef = React.useRef<HTMLButtonElement>(null)
+
+  // focus management: focus the first interactive element when opening on mobile
+  useEffect(() => {
+    if (isOpen) {
+      // small timeout to allow element to be visible before focusing
+      setTimeout(() => firstButtonRef.current?.focus(), 50)
+    }
+  }, [isOpen])
 
   const handleLogout = () => {
     localStorage.removeItem("token")
@@ -66,7 +76,22 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
   })()
 
   return (
-    <div className={`w-72 bg-slate-800 border-r border-slate-700 flex flex-col z-0 shadow-none` }>
+    <>
+      {/* Backdrop for mobile when open */}
+      <div
+        aria-hidden="true"
+        className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={onClose}
+      />
+
+      <div
+        id="mobile-sidebar"
+        role="dialog"
+        aria-label="Navigation menu"
+        aria-modal={isOpen}
+        className={`bg-slate-800 border-r border-slate-700 flex flex-col w-72 z-50 transform transition-transform duration-300 ease-in-out shadow-lg
+          ${isOpen ? 'translate-x-0 fixed left-0 top-0 bottom-0' : '-translate-x-full md:translate-x-0 md:relative'}`}
+      >
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -185,5 +210,6 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
         </Button>
       </div>
     </div>
+    </>
   )
 }
