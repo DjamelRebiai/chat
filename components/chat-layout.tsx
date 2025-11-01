@@ -32,11 +32,10 @@ export default function ChatLayout() {
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [])
+
   useEffect(() => {
     const userData = localStorage.getItem("user")
-    if (userData) {
-      setUser(JSON.parse(userData))
-    }
+    if (userData) setUser(JSON.parse(userData))
 
     const newSocket = io(SOCKET_URL, {
       auth: { token: localStorage.getItem("token") },
@@ -45,112 +44,66 @@ export default function ChatLayout() {
     })
 
     newSocket.on("connect", () => {
-      console.log("Connected to socket")
-      newSocket.emit("get_conversations", (data: any) => {
-        setConversations(data || [])
-      })
+      newSocket.emit("get_conversations", (data: any) => setConversations(data || []))
     })
 
-    newSocket.on("conversation_list", (data) => {
-      setConversations(data || [])
-    })
+    newSocket.on("conversation_list", (data) => setConversations(data || []))
 
-    // Global new_message handler for notifications / unread counts
     newSocket.on('new_message', (message: any) => {
       try {
-        // if message is for current selected conversation, UI will also receive it via ChatWindow
         if (message.conversation_id !== selectedConversation) {
           setUnreadCounts((prev) => ({ ...prev, [message.conversation_id]: (prev[message.conversation_id] || 0) + 1 }))
-          // optional toast notification
-          // show a small toast notification
-          try {
-            toast((message.senderName || 'Someone') + ': ' + (typeof message.content === 'string' ? message.content.slice(0, 80) : '[attachment]'))
-          } catch (e) {
-            console.log('[notify] message', message)
-          }
+          try { toast((message.senderName || 'Someone') + ': ' + (typeof message.content === 'string' ? message.content.slice(0, 80) : '[attachment]')) } catch (e) {}
         }
-      } catch (e) {
-        console.warn('[new_message handler] ', e)
-      }
+      } catch (e) { console.warn('[new_message handler] ', e) }
     })
 
-    // Typing indicator relay: handled in ChatWindow per conversation
-    newSocket.on('typing', (data) => {
-      // We don't handle globally here; ChatWindow listens locally for typing events
-    })
+    newSocket.on('typing', () => {})
 
-    newSocket.on("incoming_call", (data) => {
-      setCallData(data)
-      setIsCallActive(true)
-    })
-
-    newSocket.on("call_rejected", () => {
-      setIsCallActive(false)
-      setCallData(null)
-      toast.error('Call was declined')
-    })
-
-    newSocket.on("call_ended", () => {
-      setIsCallActive(false)
-      setCallData(null)
-    })
+    newSocket.on("incoming_call", (data) => { setCallData(data); setIsCallActive(true) })
+    newSocket.on("call_rejected", () => { setIsCallActive(false); setCallData(null); toast.error('Call was declined') })
+    newSocket.on("call_ended", () => { setIsCallActive(false); setCallData(null) })
 
     setSocket(newSocket)
-
-    return () => {
-      newSocket.disconnect()
-    }
-  }, [])
-
-  // Clear unread count when selecting a conversation
-  useEffect(() => {
-    if (!selectedConversation) return
-    setUnreadCounts((prev) => {
-      const copy = { ...prev }
-      delete copy[selectedConversation]
-      return copy
-    })
+    return () => { newSocket.disconnect() }
   }, [selectedConversation])
 
   return (
-    // overflow-hidden ensures the page itself doesn't scroll; each panel handles its own scrolling
-    <div className="flex h-screen bg-slate-900 text-white overflow-hidden">
-      <Sidebar
-        conversations={conversations}
-        selectedConversation={selectedConversation}
-        onSelectConversation={(id: string) => {
-          setSelectedConversation(id)
-          // close sidebar on mobile after selecting a conversation
-          if (typeof window !== 'undefined' && window.innerWidth < 768) setSidebarOpen(false)
+    <div className="relative h-screen bg-slate-900 text-white">
+      {/* Top bar spans full width of viewport and is outside the grid so it always takes full width */}
+      <TopBar
+        conversation={conversations.find((c) => c.id === selectedConversation)}
+        onCallClick={() => {
+          const caller = user || JSON.parse(localStorage.getItem('user') || '{}')
+          const cd = { conversationId: selectedConversation, callerId: caller?.id, callerName: caller?.username }
+          setCallData(cd); setIsCallActive(true); socket?.emit("initiate_call", { conversationId: selectedConversation })
         }}
-        socket={socket}
-        unreadCounts={unreadCounts}
+        onToggleSidebar={() => setSidebarOpen((s) => !s)}
         isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
       />
-  <div className="flex-1 flex flex-col relative min-h-0">
-        <TopBar
-          conversation={conversations.find((c) => c.id === selectedConversation)}
-          onCallClick={() => {
-            // open local caller UI immediately
-            const caller = user || JSON.parse(localStorage.getItem('user') || '{}')
-            const cd = { conversationId: selectedConversation, callerId: caller?.id, callerName: caller?.username }
-            setCallData(cd)
-            setIsCallActive(true)
-            socket?.emit("initiate_call", { conversationId: selectedConversation })
-          }}
-          onToggleSidebar={() => setSidebarOpen((s) => !s)}
+
+      <div className={`grid h-full transition-all duration-200 ${sidebarOpen ? 'grid-cols-1 md:grid-cols-[280px_1fr]' : 'grid-cols-1 md:grid-cols-1'}`} style={{paddingTop: '64px'}}>
+        <Sidebar
+          conversations={conversations}
+          selectedConversation={selectedConversation}
+          onSelectConversation={(id: string) => { setSelectedConversation(id); if (typeof window !== 'undefined' && window.innerWidth < 768) setSidebarOpen(false) }}
+          socket={socket}
+          unreadCounts={unreadCounts}
           isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
         />
 
-        {selectedConversation ? (
-          <ChatWindow conversationId={selectedConversation} socket={socket} />
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-slate-400">Select a conversation to start chatting</p>
-          </div>
-        )}
+        <div className="flex-1 overflow-auto">
+          {selectedConversation ? (
+            <ChatWindow conversationId={selectedConversation as string} socket={socket} />
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-slate-400">Select a conversation to start chatting</p>
+            </div>
+          )}
+        </div>
       </div>
+
       {isCallActive && (
         <VideoCallModal
           callData={callData}
