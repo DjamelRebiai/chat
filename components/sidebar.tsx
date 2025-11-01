@@ -14,25 +14,15 @@ interface SidebarProps {
   onSelectConversation: (id: string) => void
   socket: Socket | null
   unreadCounts?: Record<string, number>
-  isOpen?: boolean
-  onClose?: () => void
 }
 
-export default function Sidebar({ conversations, selectedConversation, onSelectConversation, socket, unreadCounts, isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ conversations, selectedConversation, onSelectConversation, socket, unreadCounts }: SidebarProps) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || ""
   const [searchTerm, setSearchTerm] = useState("")
   const [users, setUsers] = useState<any[]>([])
   const [showUserSearch, setShowUserSearch] = useState(false)
   const router = useRouter()
   const firstButtonRef = React.useRef<HTMLButtonElement>(null)
-
-  // Focus management
-  useEffect(() => {
-    if (isOpen) {
-      // Focus the first interactive element when sidebar opens
-      firstButtonRef.current?.focus()
-    }
-  }, [isOpen])
 
   const handleLogout = () => {
     localStorage.removeItem("token")
@@ -76,24 +66,7 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
   })()
 
   return (
-    <>
-      {/* Backdrop for mobile when open */}
-      <div 
-        aria-hidden="true"
-        className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
-          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={onClose}
-      />
-
-      <div 
-        id="mobile-sidebar"
-        role="dialog"
-        aria-label="Navigation menu"
-        aria-modal={isOpen}
-        className={`bg-slate-800 border-r border-slate-700 flex flex-col w-72 md:static md:translate-x-0 z-50 transform transition-all duration-300 ease-in-out shadow-lg 
-        ${isOpen ? 'translate-x-0 fixed left-0 top-0 bottom-0' : 'md:translate-x-0 -translate-x-full md:relative'}`}
-      >
+    <div className={`w-72 bg-slate-800 border-r border-slate-700 flex flex-col z-0 shadow-none` }>
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -111,12 +84,7 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
             >
               <Plus size={18} />
             </Button>
-            {/* Mobile close button */}
-            {onClose ? (
-              <Button size="icon" variant="ghost" className="md:hidden border-transparent" onClick={onClose}>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </Button>
-            ) : null}
+            {/* no mobile close button when sidebar is always visible */}
           </div>
         </div>
 
@@ -217,6 +185,5 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
         </Button>
       </div>
     </div>
-    </>
   )
 }

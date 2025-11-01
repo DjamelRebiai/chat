@@ -18,7 +18,6 @@ export default function ChatLayout() {
   const [user, setUser] = useState<any>(null)
   const [isCallActive, setIsCallActive] = useState(false)
   const [callData, setCallData] = useState<any>(null)
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
 
   useEffect(() => {
     const userData = localStorage.getItem("user")
@@ -108,12 +107,9 @@ export default function ChatLayout() {
         selectedConversation={selectedConversation}
         onSelectConversation={(id: string) => {
           setSelectedConversation(id)
-          setSidebarOpen(false) // close on mobile after selecting
         }}
         socket={socket}
         unreadCounts={unreadCounts}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
       />
       <div className="flex-1 flex flex-col">
         {selectedConversation ? (
@@ -128,8 +124,6 @@ export default function ChatLayout() {
                 setIsCallActive(true)
                 socket?.emit("initiate_call", { conversationId: selectedConversation })
               }}
-              onToggleSidebar={() => setSidebarOpen((s) => !s)}
-              isOpen={sidebarOpen}
             />
             <ChatWindow conversationId={selectedConversation} socket={socket} />
           </>
