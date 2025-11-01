@@ -129,23 +129,22 @@ export default function ChatLayout() {
         onClose={() => setSidebarOpen(false)}
       />
       <div className="flex-1 flex flex-col">
+        <TopBar
+          conversation={conversations.find((c) => c.id === selectedConversation)}
+          onCallClick={() => {
+            // open local caller UI immediately
+            const caller = user || JSON.parse(localStorage.getItem('user') || '{}')
+            const cd = { conversationId: selectedConversation, callerId: caller?.id, callerName: caller?.username }
+            setCallData(cd)
+            setIsCallActive(true)
+            socket?.emit("initiate_call", { conversationId: selectedConversation })
+          }}
+          onToggleSidebar={() => setSidebarOpen((s) => !s)}
+          isOpen={sidebarOpen}
+        />
+
         {selectedConversation ? (
-          <>
-            <TopBar
-              conversation={conversations.find((c) => c.id === selectedConversation)}
-              onCallClick={() => {
-                // open local caller UI immediately
-                const caller = user || JSON.parse(localStorage.getItem('user') || '{}')
-                const cd = { conversationId: selectedConversation, callerId: caller?.id, callerName: caller?.username }
-                setCallData(cd)
-                setIsCallActive(true)
-                socket?.emit("initiate_call", { conversationId: selectedConversation })
-              }}
-              onToggleSidebar={() => setSidebarOpen((s) => !s)}
-              isOpen={sidebarOpen}
-            />
-            <ChatWindow conversationId={selectedConversation} socket={socket} />
-          </>
+          <ChatWindow conversationId={selectedConversation} socket={socket} />
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <p className="text-slate-400">Select a conversation to start chatting</p>
