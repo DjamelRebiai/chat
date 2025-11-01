@@ -67,8 +67,8 @@ export default function TopBar({ conversation, onCallClick, onToggleSidebar, isO
   }
 
   return (
-    <div className="border-b border-slate-700 bg-slate-800/60 p-4 flex items-center justify-between">
-      <div className="flex items-center gap-3">
+    <div className="w-full sticky top-0 z-20 border-b border-slate-700 bg-slate-800/60 backdrop-blur-sm px-4 py-3 flex items-center justify-between">
+  <div className="flex items-center gap-3">
         {/* Toggle sidebar (visible on all sizes) */}
         <Button
           size="icon"
@@ -88,7 +88,7 @@ export default function TopBar({ conversation, onCallClick, onToggleSidebar, isO
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+  <div className="flex items-center gap-2">
         <Button size="icon" variant="ghost" className="border-transparent hover:bg-slate-700/40" disabled={!conversation}>
           <Phone size={18} />
         </Button>

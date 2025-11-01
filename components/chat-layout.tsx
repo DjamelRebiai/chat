@@ -128,7 +128,7 @@ export default function ChatLayout() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
-      <div className="flex-1 flex flex-col">
+  <div className="flex-1 flex flex-col relative min-h-0">
         <TopBar
           conversation={conversations.find((c) => c.id === selectedConversation)}
           onCallClick={() => {
