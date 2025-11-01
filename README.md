@@ -79,8 +79,8 @@ chatflow/
 
 2. **Create `.env.local`:**
    \`\`\`
-   NEXT_PUBLIC_API_URL=http://localhost:5000
-   NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
+   NEXT_PUBLIC_API_URL=https://chat-server-pwt7.onrender.com
+   NEXT_PUBLIC_SOCKET_URL=https://chat-server-pwt7.onrender.com
    \`\`\`
 
 3. **Run development server:**
@@ -125,8 +125,8 @@ chatflow/
 
 ### Frontend (.env.local)
 \`\`\`
-NEXT_PUBLIC_API_URL=http://localhost:5000
-NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=https://chat-server-pwt7.onrender.com
+NEXT_PUBLIC_SOCKET_URL=https://chat-server-pwt7.onrender.com
 \`\`\`
 
 ### Backend (.env)

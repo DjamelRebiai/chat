@@ -17,8 +17,8 @@ npm install
 
 2. Configure environment variables in `.env.local`:
 \`\`\`
-NEXT_PUBLIC_API_URL=http://localhost:5000
-NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=https://chat-server-pwt7.onrender.com
+NEXT_PUBLIC_SOCKET_URL=https://chat-server-pwt7.onrender.com
 \`\`\`
 
 3. Run development server:
@@ -60,7 +60,7 @@ npm run init-db
 npm start
 \`\`\`
 
-The backend will start on http://localhost:5000
+The backend will start on https://chat-server-pwt7.onrender.com
 
 ## Features
 
