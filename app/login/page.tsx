@@ -27,6 +27,8 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
+        mode: "cors"
       })
 
       const data = await res.json()
@@ -40,8 +42,9 @@ export default function LoginPage() {
       localStorage.setItem("user", JSON.stringify(data.user))
       toast.success("Login successful!")
       router.push("/chat")
-    } catch (error) {
-      toast.error("An error occurred. Please try again.")
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast.error(`Error: ${error?.message || "An error occurred. Please try again."}`)
     } finally {
       setLoading(false)
     }

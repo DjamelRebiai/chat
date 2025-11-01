@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Phone, Video, MoreVertical, Settings, LogOut } from "lucide-react"
+import { Phone, Video, MoreVertical, Settings, LogOut, Menu } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -9,6 +9,7 @@ import { useEffect, useState } from "react"
 interface TopBarProps {
   conversation: any
   onCallClick: () => void
+  onToggleSidebar?: () => void
 }
 
 export default function TopBar({ conversation, onCallClick }: TopBarProps) {
@@ -64,6 +65,10 @@ export default function TopBar({ conversation, onCallClick }: TopBarProps) {
   return (
     <div className="border-b border-slate-700 bg-slate-800/60 p-4 flex items-center justify-between">
       <div className="flex items-center gap-3">
+        {/* Mobile hamburger to toggle sidebar */}
+        <Button size="icon" variant="ghost" className="md:hidden border-transparent mr-1" onClick={onToggleSidebar}>
+          <Menu size={18} />
+        </Button>
         <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-lg font-semibold">{conversation.participantName?.charAt(0)}</div>
         <div>
           <h2 className="text-lg font-semibold text-white">{conversation.participantName}</h2>

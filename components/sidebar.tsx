@@ -14,9 +14,11 @@ interface SidebarProps {
   onSelectConversation: (id: string) => void
   socket: Socket | null
   unreadCounts?: Record<string, number>
+  isOpen?: boolean
+  onClose?: () => void
 }
 
-export default function Sidebar({ conversations, selectedConversation, onSelectConversation, socket, unreadCounts }: SidebarProps) {
+export default function Sidebar({ conversations, selectedConversation, onSelectConversation, socket, unreadCounts, isOpen, onClose }: SidebarProps) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || ""
   const [searchTerm, setSearchTerm] = useState("")
   const [users, setUsers] = useState<any[]>([])
@@ -65,16 +67,30 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
   })()
 
   return (
-    <div className="w-72 bg-slate-800 border-r border-slate-700 flex flex-col">
+    <>
+      {/* Backdrop for mobile when open */}
+      {isOpen ? (
+        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={onClose} />
+      ) : null}
+
+      <div className={`bg-slate-800 border-r border-slate-700 flex flex-col w-72 md:static md:translate-x-0 z-50 transform transition-transform ${isOpen ? 'translate-x-0 fixed left-0 top-0 bottom-0' : 'md:translate-x-0 -translate-x-full md:relative'}`}>
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">ChatFlow</h1>
             <p className="text-xs text-slate-400">Fast & secure messaging</p>
           </div>
-          <Button size="sm" variant="ghost" onClick={() => setShowUserSearch(!showUserSearch)} className="border-transparent">
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="ghost" onClick={() => setShowUserSearch(!showUserSearch)} className="border-transparent">
             <Plus size={18} />
-          </Button>
+            </Button>
+            {/* Mobile close button */}
+            {onClose ? (
+              <Button size="icon" variant="ghost" className="md:hidden border-transparent" onClick={onClose}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </Button>
+            ) : null}
+          </div>
         </div>
 
         {showUserSearch && (
@@ -174,5 +190,6 @@ export default function Sidebar({ conversations, selectedConversation, onSelectC
         </Button>
       </div>
     </div>
+    </>
   )
 }
