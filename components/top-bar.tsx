@@ -19,7 +19,10 @@ export default function TopBar({ conversation, onCallClick, onToggleSidebar, isO
   const [theme, setTheme] = useState<string>(typeof window !== 'undefined' ? localStorage.getItem('chat_theme') || 'blue' : 'blue')
   const [isRtl, setIsRtl] = useState<boolean>(typeof window !== 'undefined' ? (localStorage.getItem('chat_dir') === 'rtl') : false)
 
-  if (!conversation) return null
+  // allow TopBar to render even when no conversation is selected so the
+  // hamburger toggle is always available (user requested).
+  const participantInitial = conversation?.participantName?.charAt(0) ?? 'C'
+  const participantDisplayName = conversation?.participantName ?? 'No conversation selected'
 
   const handleLogout = () => {
     localStorage.removeItem("token")
@@ -78,18 +81,18 @@ export default function TopBar({ conversation, onCallClick, onToggleSidebar, isO
         >
           {isOpen ? <X size={18} /> : <Menu size={18} />}
         </Button>
-        <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-lg font-semibold">{conversation.participantName?.charAt(0)}</div>
+        <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-lg font-semibold">{participantInitial}</div>
         <div>
-          <h2 className="text-lg font-semibold text-white">{conversation.participantName}</h2>
-          <p className="text-xs text-slate-400">Online</p>
+          <h2 className="text-lg font-semibold text-white">{participantDisplayName}</h2>
+          <p className="text-xs text-slate-400">{conversation ? 'Online' : 'Select a conversation'}</p>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-        <Button size="icon" variant="ghost" className="border-transparent hover:bg-slate-700/40">
+        <Button size="icon" variant="ghost" className="border-transparent hover:bg-slate-700/40" disabled={!conversation}>
           <Phone size={18} />
         </Button>
-        <Button size="icon" variant="ghost" className="border-transparent hover:bg-slate-700/40" onClick={onCallClick}>
+        <Button size="icon" variant="ghost" className="border-transparent hover:bg-slate-700/40" onClick={onCallClick} disabled={!conversation}>
           <Video size={18} />
         </Button>
 
